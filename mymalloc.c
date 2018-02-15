@@ -7,17 +7,22 @@
 static char myblock[5000]; // creates the array that will represent memory
 
 struct node { // represents the data stored in each node of the linked list, whether a block of memory is full, and how many bytes/size of each block allocated
-	int full; // 1 = full, 0 = empty
-	int size; // size of allocated block
-	struct node * next; // points to next block of memory
+	int free; 		// 1 = full, 0 = empty
+	size_t size; 		// size of allocated block
+	struct node *next; 	// points to next block of allocated memory
 };
 
-
 void * mymalloc(size_t x, __FILE__, __LINE__){
-	if(x == 0){
+	if(x <= 0){		// makes sure x is a positive number
 		return NULL;
 	}
-	
+	if(x > 5000){		// makes sure emory requested is not larger than memory available 
+		return NULL;
+	}
+	if(x > remaining_size){	// not yet defined but easy way to keep track of if there's space left or not
+		printf("the size of the block is too small\n");
+		exit(0);
+	}
 }
 
 

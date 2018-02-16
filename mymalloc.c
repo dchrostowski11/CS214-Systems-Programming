@@ -20,20 +20,55 @@ void initialize(){	// creates the first memory block for memory
 	head_list->next = NULL;
 }
 
-void * mymalloc(size_t x, __FILE__, __LINE__){
-	if(x <= 0){		// makes sure x is a positive number
-		return NULL;
-	}
-	if(x > 5000){		// makes sure emory requested is not larger than memory available 
-		return NULL;
-	}
-	if(x > remaining_size){	// not yet defined but easy way to keep track of if there's space left or not
-		printf("the size of the block is too small\n");
-		exit(0);
-	}
+void * mymalloc(size_t size){
+    struct node *curr = block, *prev;
+    void* allocatedBlock = NULL;
+    //int n = 0;
+    
+    if(size <= 0){		// makes sure x is a positive number
+        printf("Invalid memory amount");
+        return NULL;
+    }
+    if(size > 5000){ // makes sure emory requested is not larger than memory available
+        printf("Not enough memory");
+        return NULL;
+    }
+    if(size > amountLeft){	// not yet defined but easy way to keep track of if there's space left or not
+        printf("the size of the block is too small\n");
+        exit(0);
+    }
+ 
+    if(!(block->size)){
+        block->size = 5000-sizeof(struct node);
+        block ->free=1;
+        block->next = NULL;
+    }
+    
+    while(size<(amountLeft+sizeof(struct node)) && curr->free == 1){
+        prev = curr;
+        curr = curr->next;
+        if((curr->size >= size)){
+            curr->free = 0;
+            curr++;
+            allocatedBlock = (void*)(curr);
+            amountLeft -= size;
+            printf("Successfully Allocated Memory");
+            return allocatedBlock;
+        }else{
+            printf("Could not allocate memory");
+            return NULL;
+        }
+
+    }
+    printf("hello\n");
+    return allocatedBlock;
+    
 }
 
 
 int main(int argc, char **argv){
-	return 0;
+    int x = atoi(argv[1]);
+  //  printf("Amount requested: %d", x);
+    mymalloc(x);
 }
+

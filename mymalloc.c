@@ -14,6 +14,12 @@ struct node { // represents the data stored in each node of the linked list, whe
 
 struct node *block = myblock; 	// points to first element of myblock[5000], will be used as reference to head of list
 
+void initialize(){	// creates the first memory block for memory
+	head_list->size = 5000 - sizeof(struct node);
+	head_list->free = 1;
+	head_list->next = NULL;
+}
+
 void * mymalloc(size_t x, __FILE__, __LINE__){
 	if(x <= 0){		// makes sure x is a positive number
 		return NULL;

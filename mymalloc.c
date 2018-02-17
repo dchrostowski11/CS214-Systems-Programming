@@ -66,16 +66,16 @@ void * mymalloc(size_t size){
 }
 
 //I THINK THIS SHOULD WORK
-void myfree(void *ptr, __FILE__, __LINE__){
+void myfree(void *ptr){
 	if(ptr == NULL){
 		printf("pointer does not exist in memory!\n");
-		return 0;
+		return;
 	}
 	struct node *curr = block;	//points to head of memory
 	struct node *prev = curr;
 	
 	while(curr != NULL){	//searches memory till block is found
-		if(curr == x && (curr->free == 0)){	//found the block, must set free to 1 and update amount of free space in memory
+		if(curr == ptr && (curr->free == 0)){	//found the block, must set free to 1 and update amount of free space in memory
 			if((prev->free == 0) && (curr->next->free == 0)){ //if neither adjacent block is free, just free curr
 				curr->free = 1;
 			}

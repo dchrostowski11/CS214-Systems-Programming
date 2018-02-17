@@ -88,6 +88,10 @@ void myfree(void *ptr){
 		printf("pointer does not exist in memory!\n");
 		return;
 	}
+	if(ptr->free == 1){ //the pointer has not been malloced
+		printf("the pointer has not been allocated in memory!\n");
+		return;
+	}
 	struct node *curr = head;	//points to head of memory
 	struct node *prev = curr;
 	

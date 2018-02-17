@@ -1,107 +1,129 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <stddef.h>
 #define malloc(x) mymalloc(x, __FILE__,__LINE__)
-#define free(x) myfree(x, __FILE__, __LINE__)
+#define free(x) free(x, __FILE__, __LINE__)
 
-static char myblock[5000]; // creates the array that will represent memory
-
-struct node { // represents the data stored in each node of the linked list, whether a block of memory is full, and how many bytes/size of each block allocated
-	int free; 		// 1 = full, 0 = empty
-	size_t size; 		// size of allocated block
-	struct node *next; 	// points to next block of allocated memory
+struct node { /* represents the data stored in each node of the linked list, whether a block of memory is full, and how many bytes/size of each block allocated */
+    int free; 		// 1 = full, 0 = empty
+    size_t size; 		// size of allocated block
+    struct node *next; // points to next block of allocated memory
 };
 
-struct node *block = myblock; 	// points to first element of myblock[5000], will be used as reference to head of list
+static char myblock[5000];
+int amountLeft = 5000;
+char* temp = &myblock[0];
+struct node* head = NULL;
 
-void initialize(){	// creates the first memory block for memory
-	head_list->size = 5000 - sizeof(struct node);
-	head_list->free = 1;
-	head_list->next = NULL;
+struct node* getBlock(struct node** mynode, size_t size){
+	
+	struct node* curr = head;
+	
+	while(curr != NULL && !(curr->free && curr->size >=size)){
+		*mynode = curr;
+		curr = curr->next;
+	}
+	
+	return curr;
 }
 
+struct node* createBlock(struct node* mynode, size_t size){
+	struct node *curr;
+	curr = (struct node*) (((char*)temp) + sizeof(struct node)+size);
+	if(mynode == NULL){
+		
+		mynode = curr;
+	}
+	
+	curr->size = size;
+	curr->next = NULL;
+	curr->free = 0;
+	return curr;
+	
+}
 void * mymalloc(size_t size){
-    struct node *curr = block, *prev;
-    void* allocatedBlock = NULL;
-    //int n = 0;
-    
-    if(size <= 0){		// makes sure x is a positive number
-        printf("Invalid memory amount");
-        return NULL;
-    }
-    if(size > 5000){ // makes sure emory requested is not larger than memory available
-        printf("Not enough memory");
-        return NULL;
-    }
-    if(size > amountLeft){	// not yet defined but easy way to keep track of if there's space left or not
-        printf("the size of the block is too small\n");
-        exit(0);
-    }
- 
-    if(!(block->size)){
-        block->size = 5000-sizeof(struct node);
-        block ->free=1;
-        block->next = NULL;
-    }
-    
-    while(size<(amountLeft+sizeof(struct node)) && curr->free == 1){
-        prev = curr;
-        curr = curr->next;
-        if((curr->size >= size)){
-            curr->free = 0;
-            curr++;
-            allocatedBlock = (void*)(curr);
-            amountLeft -= size;
-            printf("Successfully Allocated Memory");
-            return allocatedBlock;
-        }else{
-            printf("Could not allocate memory");
-            return NULL;
-        }
-
-    }
-    printf("hello\n");
-    return allocatedBlock;
-    
+	
+	struct node * curr = (struct node*) (((char*)temp) + sizeof(struct node)+size);
+	struct node * last = (struct node*) (((char*)temp) + sizeof(struct node)+size);
+	
+	if(size<=0 ){
+		printf("Invalid amount of memory requested\n");
+		return NULL;
+	}
+	
+	if(size>amountLeft){
+		printf("Not enough memory left\n");
+		return NULL;
+	}
+	
+	if(head == NULL){
+		curr->size = size;
+		curr->next = NULL;
+		curr->free = 0;
+		head = curr;
+	}else{
+		last = head;
+		curr = getBlock(&last, size);
+		
+		if(curr == NULL){
+			curr = createBlock(last, size);
+			
+			if(curr == NULL){
+				printf("unable to allocate memory\n");
+				return NULL;
+			}
+			amountLeft -= size + sizeof(struct node);
+		}else{
+			curr -> free = 0;
+		}
+	}
+	
+	printf("Successfully allocated %lu bytes of memory\n", size);
+	return ++curr;
+	
 }
 
-//I THINK THIS SHOULD WORK
 void myfree(void *ptr){
 	if(ptr == NULL){
 		printf("pointer does not exist in memory!\n");
 		return;
 	}
-	struct node *curr = block;	//points to head of memory
+	struct node *curr = head;	//points to head of memory
 	struct node *prev = curr;
 	
 	while(curr != NULL){	//searches memory till block is found
 		if(curr == ptr && (curr->free == 0)){	//found the block, must set free to 1 and update amount of free space in memory
 			if((prev->free == 0) && (curr->next->free == 0)){ //if neither adjacent block is free, just free curr
 				curr->free = 1;
+				printf("Successfully freed memory");
 			}
 			if((prev->free == 0) && (curr->next->free == 1)){	//if only next block is free, combine the size of memory left
 				curr->free = 1;
 				curr->size += ((curr->next->size)+sizeof(struct node));
+				printf("Successfully freed memory");
 			}
 			if((prev->free == 1) && (curr->next->free == 0)){	//if only previous block is free
 				curr->free = 1;
 				prev->size += ((curr->next->size)+sizeof(struct node));
+				printf("Successfully freed memory");
 			}
 			if((prev->free == 1) && (curr->next->free == 1)){
 				curr->free = 1;
 				prev->size += ((curr->size + sizeof(struct node)) + (curr->next->size + sizeof(struct node)));
+				printf("Successfully freed memory");
 			}
 		}
 		prev = curr;
 		curr = curr->next;
 	}
-}
 	
+	printf("unable to free memory\n");
+}
 
 
 int main(int argc, char **argv){
-    int x = atoi(argv[1]);
-  //  printf("Amount requested: %d", x);
-    mymalloc(x);
-}
 
+//	int i;
+	myfree(mymalloc(2));
+    return 0;
+}

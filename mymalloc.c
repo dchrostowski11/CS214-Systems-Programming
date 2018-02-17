@@ -65,6 +65,39 @@ void * mymalloc(size_t size){
     
 }
 
+//I THINK THIS SHOULD WORK
+void myfree(void *ptr, __FILE__, __LINE__){
+	if(ptr == NULL){
+		printf("pointer does not exist in memory!\n");
+		return 0;
+	}
+	struct node *curr = block;	//points to head of memory
+	struct node *prev = curr;
+	
+	while(curr != NULL){	//searches memory till block is found
+		if(curr == x && (curr->free == 0)){	//found the block, must set free to 1 and update amount of free space in memory
+			if((prev->free == 0) && (curr->next->free == 0)){ //if neither adjacent block is free, just free curr
+				curr->free = 1;
+			}
+			if((prev->free == 0) && (curr->next->free == 1)){	//if only next block is free, combine the size of memory left
+				curr->free = 1;
+				curr->size += ((curr->next->size)+sizeof(struct node));
+			}
+			if((prev->free == 1) && (curr->next->free == 0)){	//if only previous block is free
+				curr->free = 1;
+				prev->size += ((curr->next->size)+sizeof(struct node));
+			}
+			if((prev->free == 1) && (curr->next->free == 1)){
+				curr->free = 1;
+				prev->size += ((curr->size + sizeof(struct node)) + (curr->next->size + sizeof(struct node)));
+			}
+		}
+		prev = curr;
+		curr = curr->next;
+	}
+}
+	
+
 
 int main(int argc, char **argv){
     int x = atoi(argv[1]);

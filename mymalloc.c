@@ -88,7 +88,9 @@ void myfree(void *ptr){
 		printf("pointer does not exist in memory!\n");
 		return;
 	}
-	if(ptr->free == 1){ //the pointer has not been malloced
+	struct node *target = ptr;
+	
+	if((target->free == 1)){ //the pointer has not been malloced
 		printf("the pointer has not been allocated in memory!\n");
 		return;
 	}

@@ -15,18 +15,6 @@ int amountLeft = 5000;
 char* temp = &myblock[0];
 struct node* head = NULL;
 
-struct node* getBlock(struct node** mynode, size_t size){
-	
-	struct node* curr = head;
-	
-	while(curr != NULL && !(curr->free && curr->size >=size)){
-		*mynode = curr;
-		curr = curr->next;
-	}
-	
-	return curr;
-}
-
 struct node* createBlock(struct node* mynode, size_t size){
 	struct node *curr;
 	curr = (struct node*) (((char*)temp) + sizeof(struct node)+size);
@@ -63,8 +51,9 @@ void * mymalloc(size_t size){
 		head = curr;
 	}else{
 		last = head;
-		curr = getBlock(&last, size);
-		
+		while(curr != NULL && !(curr->free && curr->size >=size)){
+			curr = curr->next;
+		}
 		if(curr == NULL){
 			curr = createBlock(last, size);
 			
@@ -79,57 +68,51 @@ void * mymalloc(size_t size){
 	}
 	
 	printf("Successfully allocated %lu bytes of memory\n", size);
-	return ++curr;
+	return (void*)++curr;
 	
 }
 
 void myfree(void *ptr){
-	if(ptr == NULL){
-		printf("pointer does not exist in memory!\n");
-		return;
+	struct node* myblock = (struct node*) ptr-1;
+	struct node* myhead = head;
+	if(!ptr){
+		printf("Unable to free memory\n");
 	}
-	struct node *target = ptr;
 	
-	if((target->free == 1)){ //the pointer has not been malloced
-		printf("the pointer has not been allocated in memory!\n");
-		return;
+	if(!myhead){
+		printf("Unable to free memory\n");
 	}
-	struct node *curr = head;	//points to head of memory
-	struct node *prev = curr;
 	
-	while(curr != NULL){	//searches memory till block is found
-		if(curr == ptr && (curr->free == 0)){	//found the block, must set free to 1 and update amount of free space in memory
-			if((prev->free == 0) && (curr->next->free == 0)){ //if neither adjacent block is free, just free curr
-				curr->free = 1;
-				printf("Successfully freed memory");
-			}
-			if((prev->free == 0) && (curr->next->free == 1)){	//if only next block is free, combine the size of memory left
-				curr->free = 1;
-				curr->size += ((curr->next->size)+sizeof(struct node));
-				printf("Successfully freed memory");
-			}
-			if((prev->free == 1) && (curr->next->free == 0)){	//if only previous block is free
-				curr->free = 1;
-				prev->size += ((curr->next->size)+sizeof(struct node));
-				printf("Successfully freed memory");
-			}
-			if((prev->free == 1) && (curr->next->free == 1)){
-				curr->free = 1;
-				prev->size += ((curr->size + sizeof(struct node)) + (curr->next->size + sizeof(struct node)));
-				printf("Successfully freed memory");
+	
+	while(myhead != NULL){
+		if(myblock == myhead){
+			if(myhead->free == 0){
+				myhead->free = 1;
+				printf("Successfully freed memory location\n");
+				return;
+			}else{
+				printf("Memory location already freed\n");
+				return;
 			}
 		}
-		prev = curr;
-		curr = curr->next;
+		
+		myhead = myhead->next;
 	}
 	
-	printf("unable to free memory\n");
+	printf("Memory location does not exist\n");
+	return;
+	
+	
 }
 
 
 int main(int argc, char **argv){
 
-//	int i;
-	myfree(mymalloc(2));
+	int i;
+	//Just randomly testing stuff
+	for(i=0;i<150;i++){
+		int* p = (int*) mymalloc(1);
+		myfree(p+10);
+	}
     return 0;
 }

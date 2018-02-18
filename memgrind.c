@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "mymalloc.c"
-
+//NOT SURE IF THIS WILL WORK BUT I TRIED LOL
 int main(int argc, char** argv){
 	int i,j,n=0;
 	int* arr[150];

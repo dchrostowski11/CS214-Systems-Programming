@@ -34,7 +34,7 @@ int main(int argc, char** argv){
 		while(n>150){
 			x = rand() % (64 - 1 - 1);
 			n += x;
-			q = mymalloc(1);
+			q = mymalloc(x);
 			myfree(q);
 			
 		}

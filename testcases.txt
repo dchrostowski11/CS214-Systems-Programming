@@ -1,0 +1,12 @@
+Workload 5: 
+	The purpose of this workload was to see if memory can continuously be allocated and freed 
+when the amount that was to be malloced was continuously being increased.  In other words, Workload 5
+test whether or not mymalloc and my free can handle changing memory.
+
+Workload 6:
+	The purpose of this workload is meant to test the mymalloc function and see if it can allocate
+space for the entirety of the memory.  In other words, it is meant to see if can allocate all 5000 bytes
+of the memory block.  It can successuflly allocate all 5000 bytes, but has difficulty freeing those bytes
+that have been allocated.
+
+
